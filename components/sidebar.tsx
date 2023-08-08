@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Montserrat } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { CodeIcon, ImageIcon, LayoutDashboard, MessageSquare, Music, Settings, VideoIcon,User } from "lucide-react";
 import { usePathname } from "next/navigation";
-const montserrat = Montserrat({
+const montserrat = Poppins({
   weight: "600",
   subsets: ["latin"],
 });
@@ -26,7 +26,7 @@ const routes = [
   {
     label: "Image Generation",
     icon: ImageIcon,
-    href: "/image-generation", // Change this to the correct href for Image Generation.
+    href: "/image", // Change this to the correct href for Image Generation.
     color: "text-green-500",
   },
   {
