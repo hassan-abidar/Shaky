@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 import * as z from "zod";
 import React, { useState } from "react"; // Added import for useState
 import { Heading } from "@/components/heading";
-import { Image } from "lucide-react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { amountOptions, formSchema } from "./constants";
+import { amountOptions, formSchema, resolutionOptions } from "./constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Card, CardFooter } from "@/components/ui/card";
+import { Download, ImageIcon } from "lucide-react";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const ImagePage = () => {
+  const proModal=useProModal();
+
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
 
@@ -45,7 +50,9 @@ const ImagePage = () => {
       setImages(urls);
       form.reset();
     } catch (error: any) {
-      console.log(error);
+      if(error?.response?.status===403){
+        proModal.onOpen();
+    }
     } finally {
       router.refresh();
     }
@@ -55,8 +62,8 @@ const ImagePage = () => {
     <div>
       <Heading
         title="Image Generation"
-        description="Make your imaginations real ."
-        icon={Image}
+        description="Make your imaginations real."
+        icon={ImageIcon}
         iconColor="text-green-500"
         bgColor="bg-green-500/10"
       />
@@ -120,6 +127,33 @@ const ImagePage = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="resolution"
+                render={({ field }) => (
+                  <FormItem className="col-span-12 lg:col-span-2">
+                    <Select
+                      disabled={isLoading}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue defaultValue={field.value} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {resolutionOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
               <Button className="" disabled={isLoading}>
                 Generate
               </Button>
@@ -134,10 +168,29 @@ const ImagePage = () => {
           )}
           {images.length === 0 && !isLoading && (
             <div>
-              <Empty label="No images Generated ! " />
+              <Empty label="No images Generated!" />
             </div>
           )}
-          <div>{/* Images will be rendered here */}</div>
+    
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
+            {images.map((src) => (
+              <Card key={src} className="rounded-lg overflow-hidden">
+                <div className="relative aspect-square">
+                  <Image
+                    alt="image"
+                    fill
+                    src={src}
+                  />
+                </div>
+                <CardFooter className="p-2">
+                  <Button variant="secondary" className="w-full" onClick={() => window.open(src)}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>

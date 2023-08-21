@@ -9,6 +9,7 @@ const montserrat = Poppins({
   weight: "600",
   subsets: ["latin"],
 });
+import FreeCounter from "./free-counter";
 
 const routes = [
   {
@@ -32,13 +33,13 @@ const routes = [
   {
     label: "Video Generation",
     icon: VideoIcon,
-    href: "/video-generation", // Change this to the correct href for Video Generation.
+    href: "/video", // Change this to the correct href for Video Generation.
     color: "text-orange-500",
   },
   {
     label: "Music Generation",
     icon: Music,
-    href: "/music-generation", // Change this to the correct href for Music Generation.
+    href: "/music", // Change this to the correct href for Music Generation.
     color: "text-emerald-500",
   },
   {
@@ -60,8 +61,13 @@ const routes = [
     color: "text-white-500",
   },
 ];
+interface SidebarProps {
+  apiLimitCount:number;
+}
 
-const Sidebar = () => {
+const Sidebar = ({
+  apiLimitCount=0
+}:SidebarProps) => {
   const pathname= usePathname();
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
@@ -89,6 +95,9 @@ const Sidebar = () => {
           ))}
         </div>
       </div>
+      <FreeCounter 
+      apiLimitCount={apiLimitCount}
+      />
     </div>
   );
 };

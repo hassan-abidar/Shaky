@@ -17,7 +17,7 @@ import { ChatCompletionRequestMessage } from "openai";
 import Empty from "@/components/empty";
 import Loader from "@/components/loader";
 import UserAvatar from "@/components/user-avatar";
-import BotAvatar from "@/components/bot-avatar";
+import DevAvatar from "@/components/dev-avatar";
 
 const DeveloperPage = () => {
   const router = useRouter();
@@ -124,7 +124,7 @@ const DeveloperPage = () => {
                 message.role==="user" ? "bg-white border border-black/10 " : "bg-muted"
                 )}
               >   
-              {message.role==="user" ? <UserAvatar/> : <BotAvatar/>}
+              {message.role==="user" ? <UserAvatar/> : <DevAvatar/>}
                   <p className="text-sm">
                   {message.content}
                   </p>
