@@ -1,12 +1,9 @@
 import { auth,currentUser } from "@clerk/nextjs";
 
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { absolutUrl } from "@/lib/utils";
 import prismadb from "@/lib/prismadb";
-import { use } from "react";
-
-const settingsUrl = absolutUrl("/settings");
+import { stripe } from "@/lib/stripe";
 
 export async function GET() {
     try{
@@ -15,7 +12,46 @@ export async function GET() {
         if(!userId || !user){
             return new NextResponse("Unauthorized",{status:401});
         }
-        
+        const userSubscription= await prismadb.userSubscription.findUnique({
+            where:{
+                userId
+            }
+        });
+        if(userSubscription && userSubscription.stripeCustomerId){
+            const stripeSession = await stripe.billingPortal.sessions.create({
+                customer:userSubscription.stripeCustomerId,
+                return_url:"http://localhost:3000/settings",
+            });
+         return new NextResponse(JSON.stringify({url:stripeSession.url}));
+        }
+        const stripeSession = await stripe.checkout.sessions.create({
+            success_url:"http://localhost:3000/settings",
+            cancel_url:"http://localhost:3000/settings",
+            payment_method_types:["card"],
+            mode:"subscription",
+            billing_address_collection:"auto",
+            customer_email:user.emailAddresses[0].emailAddress,
+            line_items: [
+                {
+                    price_data:{
+                        currency:"USD",
+                        product_data:{
+                            name:"Shaky Pro",
+                            description:"Unlimited AI Generations",
+                        },
+                        unit_amount:1000,
+                        recurring:{
+                            interval:"month",
+                        }
+                    },
+                    quantity: 1,
+                }
+            ],
+            metadata:{
+                userId,
+            },
+         });
+         return new NextResponse(JSON.stringify({url:stripeSession.url})); 
     }catch(error){
         console.log("[STRIPE_ERROR]",error);
         return new NextResponse("Internal error",{status:500});

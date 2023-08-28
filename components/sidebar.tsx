@@ -1,15 +1,18 @@
 "use client";
+import React from "react";
 import Link from "next/link";
+import { Badge } from "./ui/badge";
 import Image from "next/image";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { CodeIcon, ImageIcon, LayoutDashboard, MessageSquare, Music, Settings, VideoIcon,User } from "lucide-react";
+import { CodeIcon, ImageIcon, LayoutDashboard, MessageSquare, Music, Settings, VideoIcon, User } from "lucide-react";
 import { usePathname } from "next/navigation";
+import FreeCounter from "./free-counter";
+
 const montserrat = Poppins({
   weight: "600",
   subsets: ["latin"],
 });
-import FreeCounter from "./free-counter";
 
 const routes = [
   {
@@ -61,24 +64,30 @@ const routes = [
     color: "text-white-500",
   },
 ];
+
 interface SidebarProps {
-  apiLimitCount:number;
+  apiLimitCount: number;
+  isPro: boolean;
 }
 
-const Sidebar = ({
-  apiLimitCount=0
-}:SidebarProps) => {
-  const pathname= usePathname();
+const Sidebar = ({ apiLimitCount = 0, isPro = false }: SidebarProps) => {
+  const pathname = usePathname();
+
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
       <div className="px-3 py-2 flex-1">
-        <Link href="/dashboard" className="flex items-center pl-3 mb-14">
+        <Link href="/dashboard" className="flex items-center pl-3 mb-14 ">
           <div className="relative w-8 h-8 mr-4">
             <Image fill alt="Logo" src="/logo_f.png" />
           </div>
-          <h1 className={cn("text-2xl font-bold", montserrat.className)}>
-            Shaky
+          <h1 className={cn("text-2xl font-bold ", montserrat.className)}>
+            Shaky 
           </h1>
+          {isPro && (
+            <Badge variant="premium" className="uppercase text-sm py-1 ">
+              pro
+            </Badge>
+          )}
         </Link>
         <div className="space-y-1">
           {routes.map((route) => (
@@ -95,9 +104,7 @@ const Sidebar = ({
           ))}
         </div>
       </div>
-      <FreeCounter 
-      apiLimitCount={apiLimitCount}
-      />
+      <FreeCounter isPro={isPro} apiLimitCount={apiLimitCount} />
     </div>
   );
 };

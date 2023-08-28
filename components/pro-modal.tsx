@@ -8,6 +8,10 @@ import { Dialog, DialogHeader,DialogTitle,DialogContent,DialogDescription, Dialo
 import { useProModal } from "@/hooks/use-pro-modal";
 import { Check } from "lucide-react";
 import { Button } from "./ui/button";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+import { useState } from "react";
 const tools = [
     {
       label:"Conversation",
@@ -49,6 +53,20 @@ const tools = [
   ]
 const ProModal = () => {
     const proModal= useProModal();
+    const [loading,setLoading]= useState(false);
+    const onSubscribe= async ()=>{
+        try {
+            setLoading(true);
+            const response= axios.get("/api/stripe");
+
+            window.location.href= (await response).data.url;
+            } catch(error){
+                    toast.error("Something went wrong");
+                 
+            } finally{
+            setLoading(false);
+        }
+    }
     return (  
         <Dialog open={proModal.isOpen} onOpenChange={proModal.onClose}>
             <DialogContent>
@@ -82,6 +100,8 @@ const ProModal = () => {
                 </DialogHeader>
                 <DialogFooter>
                     <Button
+                    disabled={loading}
+                    onClick={onSubscribe}
                     variant="premium"
                     size="lg"
                     className="w-full"

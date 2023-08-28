@@ -1,0 +1,39 @@
+"use client";
+
+import { Zap } from "lucide-react";
+import { Button } from "./ui/button";
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+interface SubcriptionButtonProps{
+    isPro:boolean;
+};
+
+export const SubscriptionButton = ({
+    isPro=false
+}:SubcriptionButtonProps)=>{
+    const [loading,setLaoding]=useState(false);
+
+    const onClick= async ()=>{
+        try{
+            setLaoding(true);
+            const response= await axios.get("/api/stripe");
+            window.location.href=response.data.url;
+        }catch(error){
+                toast.error("Something went wrong");
+             
+        }finally{
+            setLaoding(false);
+        }
+    }
+
+    return(
+    <Button disabled={loading} variant={isPro? "default":"premium"} onClick={onClick}>
+        {isPro? "Manage Subscription":"Upgrade"}
+        {!isPro  && <Zap className="w-4 h-4 ml-2 fll-white" />}
+    </Button>
+
+    )
+
+}
